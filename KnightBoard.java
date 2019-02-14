@@ -63,11 +63,9 @@ public class KnightBoard{
     for(int i =0; i < board.length; i++){
       for(int r = 0; r < board[0].length; r++){
         if(board[i][r] == 0){
-          System.out.println("P");
-          ans += " _";
+          ans += "__";
         }else{
-          System.out.println("Q");
-          ans += "" + board[i][r];
+          ans += board[i][r] + " ";
         }
       }
       ans += "\n";
