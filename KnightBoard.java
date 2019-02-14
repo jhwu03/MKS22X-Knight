@@ -44,6 +44,7 @@ public class KnightBoard{
         if(solveHelper(startingRows,startingCols,xMove,yMove,moveNumber + 1)){
           return true;
         }
+        board[xcor][ycor] = 0;
       }
     }
 
