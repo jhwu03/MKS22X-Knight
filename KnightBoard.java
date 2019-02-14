@@ -17,9 +17,9 @@ public class KnightBoard{
 
   public boolean addKnight(int x, int y,int moveNumber){
     if(x >= 0 && x < size && y >= 0 && y < size2 && board[x][y] == 0){
+        board[x][y] = moveNumber;
          return true;
        }
-    board[x][y] += moveNumber;
     return false;
   }
 
@@ -40,16 +40,19 @@ public class KnightBoard{
   private boolean solveHelper(int startingRows, int startingCols, int[] xMove, int[] yMove, int moveNumber){
     int xcor,ycor;
     if(moveNumber == size * size){
+      System.out.println("" + size+ "," + moveNumber);
       return true;
+
     }
     for(int i = 0; i < 8 ; i++){
       xcor = startingRows + xMove[i];
       ycor = startingCols + yMove[i];
       if(addKnight(xcor,ycor,moveNumber)){
-        if(solveHelper(startingRows,startingCols,xMove,yMove,moveNumber + 1)){
+        if(solveHelper(xcor,ycor,xMove,yMove,moveNumber + 1)){
           return true;
-        }
+        }else{
         board[xcor][ycor] = 0;
+      }
       }
     }
     return false;
@@ -60,8 +63,10 @@ public class KnightBoard{
     for(int i =0; i < board.length; i++){
       for(int r = 0; r < board[0].length; r++){
         if(board[i][r] == 0){
+          System.out.println("P");
           ans += " _";
         }else{
+          System.out.println("Q");
           ans += "" + board[i][r];
         }
       }
