@@ -56,20 +56,57 @@ public class KnightBoard{
         board[xcor][ycor] = moveNumber;
         if(solveHelper(xcor,ycor,xMove,yMove,moveNumber + 1)){
           return true;
-        }else{
+        }
         board[xcor][ycor] = 0;
-      }
       }
     }
     return false;
   }
 
+  public int countSolutions(int startingRow, int startingCol){
+    if(startingRow > board.length || startingCol > board[0].length
+       || startingRow < 0 || startingCol < 0) throw new IllegalStateException();
+
+     for(int i =0; i < board.length; i++){
+       for(int r = 0; r < board[0].length; r++){
+         if(board[i][r] != 0){
+           throw new IllegalStateException();
+         }
+       }
+     }
+     addKnight(startingRow,startingCol,1);
+     return countHelper(startingRow,startingCol, xMove, yMove,2);
+  }
+
+  private int countHelper(int startingRow, int startingCol, int[] xMove, int[] yMove, int moveNumber){
+    int xcor,ycor,ans;
+    if(moveNumber > size * size){
+      //System.out.println("" + size+ "," + moveNumber);
+      return 1;
+
+    }
+    for(int i = 0; i < 8 ; i++){
+      xcor = startingRows + xMove[i];
+      ycor = startingCols + yMove[i];
+      if(isSafe(xcor,ycor,board)){
+        board[xcor][ycor] = moveNumber;
+          return ans += countHelper(startingRow,startingCol, xMove, yMove,moveNumber + 1);
+        }
+        board[xcor][ycor] = 0;
+      }
+      return ans;
+    }
+
   public String toString(){
     String ans = "";
     for(int i =0; i < board.length; i++){
       for(int r = 0; r < board[0].length; r++){
+        if(board[i][r] < 10){
+          ans += " " + board[i][r] + " ";
+        }else{
           ans += board[i][r] + " ";
         }
+      }
       ans += "\n";
     }
     return ans;
@@ -77,7 +114,7 @@ public class KnightBoard{
   }
 
   public static void main(String[] args) {
-    KnightBoard board = new KnightBoard(3,3);
+    KnightBoard board = new KnightBoard(8,8);
     System.out.println(board.solve(0,0));
     System.out.println(board);
 
