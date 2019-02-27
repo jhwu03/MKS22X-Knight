@@ -4,13 +4,44 @@ public class KnightBoard{
   int size2;
   int[] xMove = {1,2,2,1,-1,-2,-2,-1};
   int[] yMove = {2,1,-1,-2,-2,-1,1,2};
+  int[][] outMoves;
   public KnightBoard(int rows,int cols){
     board = new int[rows][cols];
+    outMoves = new int[rows][cols];
     size = board.length;
     size2 = board[0].length;
     for(int i =0; i < board.length; i++){
       for(int r = 0; r < board[0].length; r++){
         board[i][r] = 0;
+      }
+    }
+    for(int i = 0; i < rows; i++) {
+      for(int j = 0; j < cols; j++) {
+        if(i == 0 || i == rows - 1) {
+          if(j == 0 || j == cols - 1) {
+            outMoves[i][j] = 2;
+          }else if(j == 1 || j == cols - 2) {
+            outMoves[i][j] = 3;
+          }else{
+            outMoves[i][j] = 4;
+          }
+        }else if(i == 1 || i == rows - 2) {
+          if(j == 0 || j == cols - 1) {
+            outMoves[i][j] = 3;
+          }else if(j == 1 || j == cols - 2) {
+            outMoves[i][j] = 4;
+          }else{
+            outMoves[i][j] = 6;
+          }
+        }else{
+          if(j == 0 || j == cols - 1) {
+            outMoves[i][j] = 4;
+          }else if(j == 1 || j == cols - 2) {
+            outMoves[i][j] = 6;
+          }else{
+            outMoves[i][j] = 8;
+          }
+        }
       }
     }
   }
@@ -27,6 +58,19 @@ public class KnightBoard{
     return false;
   }
 
+  public boolean addKnightO(int x, int y, int moveNumber) {
+    if(x >= 0 && x < size && y >= 0 && y < size2 && board[x][y] == 0){
+        board[x][y] = moveNumber;
+      for (int i = 0; i < 8; i++) {
+        if (x + xMove[i] >= 0 && x + xMove[i] < size && y + yMove[i] >= 0 && y + xMove[i] < size2) {
+          outMoves[x + xMove[i]][y + yMove[i]]--;
+        }
+      return true;
+    }
+  }
+  return false;
+}
+
   private boolean removeKnight(int r, int c){
   if (r < 0 || r >= board.length || c < 0 || c >= board.length){
     return false;
@@ -36,6 +80,21 @@ public class KnightBoard{
   }
   board[r][c] = 0;
   return true;
+}
+
+public boolean removeKnightO(int x, int y) {
+  if (x >= 0 && x < size && y >= 0 && y < size2 ) {
+    if (board[x][y] != 0) {
+      board[x][y] = 0;
+      for (int i = 0; i < 8; i++) {
+        if (x + xMove[i] >= 0 && x + xMove[i] < size && y + yMove[i] >= 0 && y + yMove[i] < size2) {
+          outMoves[x + xMove[i]][y + yMove[i]]++;
+        }
+      }
+      return true;
+    }
+  }
+  return false;
 }
 
   public boolean solve(int startingRows, int startingCols){
@@ -133,6 +192,17 @@ public class KnightBoard{
     return ans;
 
   }
+
+  public String toStringOut() {
+  String ans = "";
+  for (int i = 0; i < size; i++) {
+    for (int j = 0; j < size2; j++) {
+      ans = ans + outMoves[i][j] + " ";
+    }
+    ans += '\n';
+  }
+  return ans;
+}
 
   public static void main(String[] args) {
     KnightBoard board = new KnightBoard(5,6);
