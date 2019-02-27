@@ -45,9 +45,8 @@ public class KnightBoard{
       }
     }
   }
-  public boolean isSafe(int x, int y, int board[][]) {
-    return (x >= 0 && x < size && y >= 0 &&
-            y < size && board[x][y] == 0);
+  public boolean isSafe(int x, int y, int i) {
+    return (x + xMove[i] >= 0 && x + xMove[i] < size && y + yMove[i] >= 0 && y + yMove[i] < size2);
 }
 
   public boolean addKnight(int x, int y,int moveNumber){
@@ -62,8 +61,8 @@ public class KnightBoard{
     if(x >= 0 && x < size && y >= 0 && y < size2 && board[x][y] == 0){
         board[x][y] = moveNumber;
       for (int i = 0; i < 8; i++) {
-        if (x + xMove[i] >= 0 && x + xMove[i] < size && y + yMove[i] >= 0 && y + xMove[i] < size2) {
-          outMoves[x + xMove[i]][y + yMove[i]]--;
+        if (isSafe(x,y,i)) {
+          outMoves[x + xMove[i]][y + yMove[i]]-= 1;// remove one move if it goes out of bounds
         }
       return true;
     }
@@ -83,19 +82,54 @@ public class KnightBoard{
 }
 
 public boolean removeKnightO(int x, int y) {
-  if (x >= 0 && x < size && y >= 0 && y < size2 ) {
-    if (board[x][y] != 0) {
+  if (x >= 0 && x < size && y >= 0 && y < size2 && board[x][y] != 0) {
       board[x][y] = 0;
       for (int i = 0; i < 8; i++) {
-        if (x + xMove[i] >= 0 && x + xMove[i] < size && y + yMove[i] >= 0 && y + yMove[i] < size2) {
-          outMoves[x + xMove[i]][y + yMove[i]]++;
-        }
+        if (isSafe(x,y,i)) {
+          outMoves[x + xMove[i]][y + yMove[i]]+= 1;
       }
       return true;
     }
   }
   return false;
 }
+//sorts the x and y move arrays so they move towards the lowest move number first
+public void reorder(int x, int y) {
+  int temp;
+  int xcor;
+  int ycor;
+  int[] outGoingMoves = new int[8];
+  for (int i = 0; i < 8; i++) {
+    if (isSafe(x,y,i)) {
+      if (board[x + xMove[i]][y + yMove[i]] != 0) {
+        //If knight is on the the square we check, push to the back
+        outGoingMoves[i] = 100;
+      }else{
+        outGoingMoves[i] = outMoves[x + xMove[i]][y + yMove[i]];
+      }
+    }else{
+      outGoingMoves[i] = 100;
+    }
+  }
+  for (int r = 1; r < 8; r++) {
+    xcor = xMove[r];
+    temp = outGoingMoves[r];
+    ycor = yMove[r];
+    int c = r;
+  while ( c > 0 && outGoingMoves[c-1] > temp ) {
+    outGoingMoves[c] = outGoingMoves[c-1];
+    xMove[c] = xMove[c-1];
+    yMove[c] = yMove[c-1];
+    c -= 1;
+  }
+  xMove[c] = xcor;
+  outGoingMoves[c] = temp;
+  yMove[c] = ycor;
+  c = 0;
+}
+}
+
+
 
   public boolean solve(int startingRows, int startingCols){
     if(startingRows > board.length || startingCols > board[0].length
@@ -116,23 +150,21 @@ public boolean removeKnightO(int x, int y) {
     if(moveNumber > size * size2){
       //System.out.println("" + size+ "," + moveNumber);
       return true;
-    }
-    if (startingRows < 0 || startingCols < 0 || startingRows >= size || startingCols >= size2) {
-      return false; // if out of bounds go back
-    }
-    if (board[startingRows][startingCols] != 0) {
-      return false;
-      // if this is a knight go back
-    }
+    }else{
+
+    if(addKnightO(startingRows,startingCols,moveNumber)){
+      reorder(startingRows,startingCols);
     for(int i = 0; i < 8 ; i++){
-        board[startingRows][startingCols] = moveNumber;
         if(solveHelper(startingRows + xMove[i],startingCols + yMove[i],xMove,yMove,moveNumber + 1)){
           return true;
         }
-        board[startingRows][startingCols] = 0;
+      }
+      removeKnightO(startingRows,startingCols);
     }
     return false;
   }
+}
+
 
 
 
@@ -179,8 +211,8 @@ public boolean removeKnightO(int x, int y) {
 
   public String toString(){
     String ans = "";
-    for(int i =0; i < board.length; i++){
-      for(int r = 0; r < board[0].length; r++){
+    for(int i =0; i < size; i++){
+      for(int r = 0; r < size2; r++){
         if(board[i][r] < 10){
           ans += " " + board[i][r] + " ";
         }else{
